@@ -1,7 +1,7 @@
-﻿using System.Xml;
-using ZeroSSLApi;
+﻿using ZeroSSLApi;
+using ZeroSSLApi.Client;
+using ZeroSSLApi.Objets;
 using ZeroSSLApi.Objets.Certificate;
-using ZeroSSLApi.Objets.CsrCheck;
 
 namespace Test
 {
@@ -14,24 +14,33 @@ namespace Test
 
         static async Task MainAsync()
         {
-            string dominio = $"101.entecprois.com";
+            for (int i = 1; i <= 15; i++)
+            {
+                string dominio = $"{Guid.NewGuid()}.entecprois.com";
 
-            ZeroSslClient zeroSslClient = new ZeroSslClient(await File.ReadAllTextAsync("D:\\zerossltoken.txt"));
+                ZeroSslClient zeroSslClient = new ZeroSslClient(await File.ReadAllTextAsync("D:\\zerossltoken.txt"));
 
-            // Llave privada
-            string privateKey = zeroSslClient.Tools.GenerarClavePrivada();
+                // Llave privada
+                string privateKey = zeroSslClient.Tools.GenerarClavePrivada();
 
-            // Certificado
-            Certificate certificate = await zeroSslClient.Certificate.Create(dominio, privateKey);
+                // Certificado
+                Console.WriteLine($"Creando certificado {i}");
+                Certificate certificate = await zeroSslClient.Certificate.Create(dominio, privateKey);
+                string id = certificate.Id;
 
-            // Grabar fichero
-            FileInfo fileInfo = new FileInfo(certificate.Validation.OtherMethods.DomainDotCom.FileValidationUrlHttp);
-            string ficharo = $"{fileInfo}".Replace($"http://{dominio}", string.Empty);
-            ficharo = ficharo.Replace("/", "\\");
-            ficharo = $"C:\\inetpub\\wwwroot{ficharo}";
-            await File.WriteAllTextAsync(ficharo, $"{string.Join("\n", certificate.Validation.OtherMethods.DomainDotCom.FileValidationContent)}");
+                // Grabar fichero
+                Console.WriteLine($"Preparando validación {i}");
+                FileInfo fileInfo = new FileInfo(certificate.Validation.OtherMethods.DomainDotCom.FileValidationUrlHttp);
+                string ficharo = $"{fileInfo}".Replace($"http://{dominio}", string.Empty);
+                ficharo = ficharo.Replace("/", "\\");
+                ficharo = $"C:\\inetpub\\wwwroot{ficharo}";
+                await File.WriteAllTextAsync(ficharo, $"{string.Join("\n", certificate.Validation.OtherMethods.DomainDotCom.FileValidationContent)}");
 
-            
+                Console.WriteLine($"Haciendo challenge {i}");
+                bool challenge = await zeroSslClient.Certificate.Challenge(certificate, ValidationMethod.HTTP_CSR_HASH);
+            }
+
+            Console.WriteLine("Enter para continuar");
             Console.ReadLine();
         }
     }
