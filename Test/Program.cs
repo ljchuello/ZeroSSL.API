@@ -18,7 +18,7 @@ namespace Test
 
         static async Task MainAsync()
         {
-            string dominio = $"201.entecprois.com";
+            string dominio = $"202.entecprois.com";
 
             ZeroSslClient zeroSslClient = new ZeroSslClient(await File.ReadAllTextAsync("D:\\zerossltoken.txt"));
 
