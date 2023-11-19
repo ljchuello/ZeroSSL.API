@@ -2,7 +2,11 @@
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.OpenSsl;
 using Org.BouncyCastle.Security;
+using Org.BouncyCastle.X509;
+using System.Security.AccessControl;
 using ZeroSSLApi;
+using ZeroSSLApi.Client;
+using ZeroSSLApi.Objets;
 using ZeroSSLApi.Objets.Certificate;
 using ZeroSSLApi.Objets.Download;
 
@@ -17,12 +21,11 @@ namespace Test
 
         static async Task MainAsync()
         {
-            string dominio = $"app.entecprois.com";
+            string dominio = $"123.entecprois.com";
 
             ZeroSslClient zeroSslClient = new ZeroSslClient(await File.ReadAllTextAsync("D:\\zerossltoken.txt"));
 
             // Llave privada
-            //string privateKey = zeroSslClient.Tools.GenerarClavePrivada();
             AsymmetricCipherKeyPair keyPair = GenerateRsaKeyPair();
             string privateKey = GetPrivateKeyAsString(keyPair.Private);
 
@@ -43,16 +46,6 @@ namespace Test
             Download download = await zeroSslClient.Certificate.Download(certificate);
             await File.WriteAllTextAsync("E:\\certificate.crt", download.CertificateCrt);
             await File.WriteAllTextAsync("E:\\private.key", privateKey);
-
-            //// Paso 1: Generar la Llave Privada
-            //AsymmetricCipherKeyPair keyPair = GenerateRsaKeyPair();
-            //string privateKeyString = GetPrivateKeyAsString(keyPair.Private);
-            //Console.WriteLine("Llave privada:");
-            //Console.WriteLine(privateKeyString);
-
-            //// Paso 2: Generar el CSR
-            //X509Certificate csr = GenerateCsr(keyPair, dominio);
-            //SaveCsr(csr, "tuDominio.csr");
 
             Console.WriteLine("Enter para continuar");
             Console.ReadLine();

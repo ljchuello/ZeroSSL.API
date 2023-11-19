@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Runtime.ConstrainedExecution;
 using ZeroSSLApi.Objets;
 using ZeroSSLApi.Objets.Download;
+using Org.BouncyCastle.Crypto;
 
 namespace ZeroSSLApi.Client
 {
@@ -46,14 +47,10 @@ namespace ZeroSSLApi.Client
         /// It allows creating a certificate, and it's returned as an object. After creating the certificate, you'll need to verify it.
         /// </summary>
         /// <param name="domain">Domain for which to generate the certificate</param>
-        /// <param name="privateKey">Private key with which the certificate will be generated</param>
+        /// <param name="asymmetricCipherKeyPair"></param>
         /// <returns></returns>
         public async Task<Certificate> Create(string domain, string csr)
         {
-            // Csr
-            //ToolsClient toolsClient = new ToolsClient(_token);
-            //string csr = toolsClient.GenerarCSR(domain, privateKey);
-
             // Set
             string raw = $"{{ \"certificate_domains\": \"{domain}\", \"certificate_csr\": \"{csr}\" }}";
 

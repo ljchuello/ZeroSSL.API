@@ -1,13 +1,12 @@
-﻿using System;
-using System.Security.Cryptography.X509Certificates;
-using System.Security.Cryptography;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System.Threading.Tasks;
 using Org.BouncyCastle.Crypto;
 using ZeroSSLApi.Objets.CsrCheck;
-using Org.BouncyCastle.Security;
 using System.IO;
 using Org.BouncyCastle.OpenSsl;
+using Org.BouncyCastle.Asn1.X509;
+using Org.BouncyCastle.Pkcs;
+using Org.BouncyCastle.Security;
 
 namespace ZeroSSLApi.Client
 {
@@ -32,45 +31,35 @@ namespace ZeroSSLApi.Client
             return JsonConvert.DeserializeObject<CsrCheck>(jsonResponse) ?? new CsrCheck();
         }
 
-        public string GenerarClavePrivada(int longitudClave = 2048)
+        public string GenerateCSR(AsymmetricCipherKeyPair keyPair, string domain)
         {
-            //using (RSA rsa = RSA.Create())
-            //{
-            //    rsa.KeySize = longitudClave;
-            //    string clavePrivada = Convert.ToBase64String(rsa.ExportRSAPrivateKey()).TrimEnd('\r', '\n');
-
-            //    return clavePrivada;
-            //}
-
-            var keyGenerationParameters = new KeyGenerationParameters(new SecureRandom(), 2048);
-            var generator = GeneratorUtilities.GetKeyPairGenerator("RSA");  // Corregido aquí
-            generator.Init(keyGenerationParameters);
+            Pkcs10CertificationRequest csrGenerator = new Pkcs10CertificationRequest("SHA256WITHRSA", new X509Name($"CN={domain}"), keyPair.Public, null, keyPair.Private);
 
             using (StringWriter stringWriter = new StringWriter())
             {
                 PemWriter pemWriter = new PemWriter(stringWriter);
-                pemWriter.WriteObject(generator);
+                pemWriter.WriteObject(csrGenerator);
                 return stringWriter.ToString();
             }
         }
 
-        public string GenerarCSR(string dominio, string clavePrivadaBase64)
+
+        public AsymmetricCipherKeyPair GenerateRsaKeyPair()
         {
-            byte[] clavePrivadaBytes = Convert.FromBase64String(clavePrivadaBase64);
+            var keyGenerationParameters = new KeyGenerationParameters(new SecureRandom(), 2048);
+            var generator = GeneratorUtilities.GetKeyPairGenerator("RSA");
+            generator.Init(keyGenerationParameters);
 
-            using (RSA rsa = RSA.Create())
+            return generator.GenerateKeyPair();
+        }
+
+        public string GetPrivateKeyAsString(AsymmetricKeyParameter privateKey)
+        {
+            using (StringWriter stringWriter = new StringWriter())
             {
-                rsa.ImportRSAPrivateKey(clavePrivadaBytes, out _);
-
-                var request = new CertificateRequest(
-                    new X500DistinguishedName($"CN={dominio}"),
-                    rsa,
-                    HashAlgorithmName.SHA256,
-                    RSASignaturePadding.Pkcs1
-                );
-
-                var csrBytes = request.CreateSigningRequest();
-                return Convert.ToBase64String(csrBytes).Trim();
+                PemWriter pemWriter = new PemWriter(stringWriter);
+                pemWriter.WriteObject(privateKey);
+                return stringWriter.ToString();
             }
         }
     }
