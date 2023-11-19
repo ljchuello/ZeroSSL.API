@@ -48,14 +48,14 @@ namespace ZeroSSLApi.Client
         /// <param name="domain">Domain for which to generate the certificate</param>
         /// <param name="privateKey">Private key with which the certificate will be generated</param>
         /// <returns></returns>
-        public async Task<Certificate> Create(string domain, string privateKey)
+        public async Task<Certificate> Create(string domain, string csr)
         {
             // Csr
-            ToolsClient toolsClient = new ToolsClient(_token);
-            string csr = toolsClient.GenerarCSR(domain, privateKey);
+            //ToolsClient toolsClient = new ToolsClient(_token);
+            //string csr = toolsClient.GenerarCSR(domain, privateKey);
 
             // Set
-            string raw = $"{{ \"certificate_domains\": \"{domain}\", \"certificate_csr\": \"{csr.Trim()}\" }}";
+            string raw = $"{{ \"certificate_domains\": \"{domain}\", \"certificate_csr\": \"{csr}\" }}";
 
             // Send
             string json = await Core.SendPostRequest($"/certificates?access_key={_token}", raw);
@@ -108,34 +108,17 @@ namespace ZeroSSLApi.Client
             // To object
             Download download = JsonConvert.DeserializeObject<Download>(json) ?? new Download();
 
-            // Set private key
-            download.PrivateKey = $"-----BEGIN PRIVATE KEY-----\n{privateKey}\n-----END PRIVATE KEY-----";
-
             // Freedom
             return download;
         }
 
-        public async Task<Download> Download(Certificate certificate, string privateKey)
+        public async Task<Download> Download(Certificate certificate)
         {
             // Send
             string json = await Core.SendGetRequest($"/certificates/{certificate.Id}/download/return?access_key={_token}");
 
             // To object
             Download download = JsonConvert.DeserializeObject<Download>(json) ?? new Download();
-
-            const int lineLength = 64;
-
-            // Private key
-            string formattedKey = $"-----BEGIN PRIVATE KEY-----\n";
-            for (int i = 0; i < privateKey.Length; i += lineLength)
-            {
-                int remainingLength = Math.Min(lineLength, privateKey.Length - i);
-                formattedKey += privateKey.Substring(i, remainingLength) + "\n";
-            }
-            formattedKey += $"-----END PRIVATE KEY-----";
-
-            // Set private key
-            download.PrivateKey = formattedKey;
 
             // Freedom
             return download;

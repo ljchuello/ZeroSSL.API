@@ -9,8 +9,5 @@ namespace ZeroSSLApi.Objets.Download
 
         [JsonProperty("ca_bundle.crt", NullValueHandling = NullValueHandling.Ignore)]
         public string CaBundleCrt { get; set; } = string.Empty;
-
-        [JsonProperty("private.key", NullValueHandling = NullValueHandling.Ignore)]
-        public string PrivateKey { get; set; } = string.Empty;
     }
 }
