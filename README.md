@@ -2,6 +2,8 @@
 
 ![CloudFlare.Dns](https://raw.githubusercontent.com/ljchuello/ZeroSSL.API/master/icon_128.png)
 
+Library in .NET / C# that allows interacting with ZeroSSL APIs to manage certificates. Ideal for automating the creation and renewal of certificates without dealing with Let's Encrypt limits
+
 ## Compatibility
 
 This library is developed in .NET Standard 2.1 and is compatible with all .NET and .NET Core implementations (.NET Framework is not supported) , it can also be used in Console projects, Web API, Class Library and even with Blazor WASM.
