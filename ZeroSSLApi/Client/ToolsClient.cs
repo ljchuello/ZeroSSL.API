@@ -31,14 +31,14 @@ namespace ZeroSSLApi.Client
             return JsonConvert.DeserializeObject<CsrCheck>(jsonResponse) ?? new CsrCheck();
         }
 
-        public string GenerateCSR(AsymmetricCipherKeyPair keyPair, string domain)
+        public string GenerateCsr(AsymmetricCipherKeyPair keyPair, string commonName)
         {
-            Pkcs10CertificationRequest csrGenerator = new Pkcs10CertificationRequest("SHA256WITHRSA", new X509Name($"CN={domain}"), keyPair.Public, null, keyPair.Private);
+            Pkcs10CertificationRequest pkcs10CertificationRequest = new Pkcs10CertificationRequest("SHA256WITHRSA", new X509Name($"CN={commonName}"), keyPair.Public, null, keyPair.Private);
 
             using (StringWriter stringWriter = new StringWriter())
             {
                 PemWriter pemWriter = new PemWriter(stringWriter);
-                pemWriter.WriteObject(csrGenerator);
+                pemWriter.WriteObject(pkcs10CertificationRequest);
                 return stringWriter.ToString();
             }
         }

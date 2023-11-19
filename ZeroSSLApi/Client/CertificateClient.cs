@@ -1,11 +1,7 @@
-﻿using System;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using ZeroSSLApi.Objets.Certificate;
-using static System.Net.Mime.MediaTypeNames;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Runtime.ConstrainedExecution;
 using ZeroSSLApi.Objets;
 using ZeroSSLApi.Objets.Download;
 using Org.BouncyCastle.Crypto;
@@ -49,8 +45,16 @@ namespace ZeroSSLApi.Client
         /// <param name="domain">Domain for which to generate the certificate</param>
         /// <param name="asymmetricCipherKeyPair"></param>
         /// <returns></returns>
-        public async Task<Certificate> Create(string domain, string csr)
+        public async Task<Certificate> Create(string domain, AsymmetricCipherKeyPair asymmetricCipherKeyPair)
         {
+            ToolsClient toolsClient = new ToolsClient(_token);
+
+            // CSR
+            string csr = toolsClient.GenerateCsr(asymmetricCipherKeyPair, domain);
+            csr = csr.Trim();
+            csr = csr.Replace("\r", string.Empty);
+            csr = csr.Replace("\n", string.Empty);
+
             // Set
             string raw = $"{{ \"certificate_domains\": \"{domain}\", \"certificate_csr\": \"{csr}\" }}";
 

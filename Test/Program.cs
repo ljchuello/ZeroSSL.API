@@ -1,12 +1,9 @@
 ﻿using Org.BouncyCastle.Asn1.X509;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.OpenSsl;
+using Org.BouncyCastle.Pkcs;
 using Org.BouncyCastle.Security;
-using Org.BouncyCastle.X509;
-using System.Security.AccessControl;
 using ZeroSSLApi;
-using ZeroSSLApi.Client;
-using ZeroSSLApi.Objets;
 using ZeroSSLApi.Objets.Certificate;
 using ZeroSSLApi.Objets.Download;
 
@@ -21,23 +18,16 @@ namespace Test
 
         static async Task MainAsync()
         {
-            string dominio = $"123.entecprois.com";
+            string dominio = $"106.entecprois.com";
 
             ZeroSslClient zeroSslClient = new ZeroSslClient(await File.ReadAllTextAsync("D:\\zerossltoken.txt"));
 
             // Llave privada
-            AsymmetricCipherKeyPair keyPair = GenerateRsaKeyPair();
-            string privateKey = GetPrivateKeyAsString(keyPair.Private);
-
-            string csr = GenerateCsr(keyPair, dominio);
-            csr = csr.Trim();
-            csr = csr.Replace("\n", string.Empty);
-            csr = csr.Replace("\r", string.Empty);
-
-            var check = await zeroSslClient.Tools.CsrCheck(csr);
+            AsymmetricCipherKeyPair asymmetricCipherKeyPair = GenerateRsaKeyPair();
+            string privateKey = GetPrivateKeyAsString(asymmetricCipherKeyPair.Private);
 
             // Certificado
-            Certificate certificate = await zeroSslClient.Certificate.Create(dominio, csr);
+            Certificate certificate = await zeroSslClient.Certificate.Create(dominio, asymmetricCipherKeyPair);
             string id = certificate.Id;
 
             Console.WriteLine($"{dominio} creado, valide y luego presione enter");
@@ -66,18 +56,6 @@ namespace Test
             {
                 PemWriter pemWriter = new PemWriter(stringWriter);
                 pemWriter.WriteObject(privateKey);
-                return stringWriter.ToString();
-            }
-        }
-
-        static string GenerateCsr(AsymmetricCipherKeyPair keyPair, string commonName)
-        {
-            var csrGenerator = new Org.BouncyCastle.Pkcs.Pkcs10CertificationRequest("SHA256WITHRSA", new X509Name($"CN={commonName}"), keyPair.Public, null, keyPair.Private);
-
-            using (StringWriter stringWriter = new StringWriter())
-            {
-                PemWriter pemWriter = new PemWriter(stringWriter);
-                pemWriter.WriteObject(csrGenerator);
                 return stringWriter.ToString();
             }
         }
