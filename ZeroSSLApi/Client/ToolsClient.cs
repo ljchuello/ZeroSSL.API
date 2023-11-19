@@ -43,7 +43,6 @@ namespace ZeroSSLApi.Client
             }
         }
 
-
         public AsymmetricCipherKeyPair GenerateRsaKeyPair()
         {
             var keyGenerationParameters = new KeyGenerationParameters(new SecureRandom(), 2048);

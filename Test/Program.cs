@@ -18,46 +18,22 @@ namespace Test
 
         static async Task MainAsync()
         {
-            string dominio = $"106.entecprois.com";
+            string dominio = $"201.entecprois.com";
 
             ZeroSslClient zeroSslClient = new ZeroSslClient(await File.ReadAllTextAsync("D:\\zerossltoken.txt"));
 
             // Llave privada
-            AsymmetricCipherKeyPair asymmetricCipherKeyPair = GenerateRsaKeyPair();
-            string privateKey = GetPrivateKeyAsString(asymmetricCipherKeyPair.Private);
+            AsymmetricCipherKeyPair asymmetricCipherKeyPair = zeroSslClient.Tools.GenerateRsaKeyPair();
 
             // Certificado
             Certificate certificate = await zeroSslClient.Certificate.Create(dominio, asymmetricCipherKeyPair);
-            string id = certificate.Id;
 
             Console.WriteLine($"{dominio} creado, valide y luego presione enter");
             Console.ReadLine();
 
             Download download = await zeroSslClient.Certificate.Download(certificate);
             await File.WriteAllTextAsync("E:\\certificate.crt", download.CertificateCrt);
-            await File.WriteAllTextAsync("E:\\private.key", privateKey);
-
-            Console.WriteLine("Enter para continuar");
-            Console.ReadLine();
-        }
-
-        static AsymmetricCipherKeyPair GenerateRsaKeyPair()
-        {
-            var keyGenerationParameters = new KeyGenerationParameters(new SecureRandom(), 2048);
-            var generator = GeneratorUtilities.GetKeyPairGenerator("RSA");
-            generator.Init(keyGenerationParameters);
-
-            return generator.GenerateKeyPair();
-        }
-
-        static string GetPrivateKeyAsString(AsymmetricKeyParameter privateKey)
-        {
-            using (StringWriter stringWriter = new StringWriter())
-            {
-                PemWriter pemWriter = new PemWriter(stringWriter);
-                pemWriter.WriteObject(privateKey);
-                return stringWriter.ToString();
-            }
+            await File.WriteAllTextAsync("E:\\private.key", zeroSslClient.Tools.GetPrivateKeyAsString(asymmetricCipherKeyPair.Private));
         }
     }
 }
