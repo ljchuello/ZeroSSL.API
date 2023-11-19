@@ -2,6 +2,7 @@
 using ZeroSSLApi.Client;
 using ZeroSSLApi.Objets;
 using ZeroSSLApi.Objets.Certificate;
+using ZeroSSLApi.Objets.Download;
 
 namespace Test
 {
@@ -14,31 +15,23 @@ namespace Test
 
         static async Task MainAsync()
         {
-            for (int i = 1; i <= 15; i++)
-            {
-                string dominio = $"{Guid.NewGuid()}.entecprois.com";
+            string dominio = $"app.entecprois.com";
 
-                ZeroSslClient zeroSslClient = new ZeroSslClient(await File.ReadAllTextAsync("D:\\zerossltoken.txt"));
+            ZeroSslClient zeroSslClient = new ZeroSslClient(await File.ReadAllTextAsync("D:\\zerossltoken.txt"));
 
-                // Llave privada
-                string privateKey = zeroSslClient.Tools.GenerarClavePrivada();
+            // Llave privada
+            string privateKey = zeroSslClient.Tools.GenerarClavePrivada();
 
-                // Certificado
-                Console.WriteLine($"Creando certificado {i}");
-                Certificate certificate = await zeroSslClient.Certificate.Create(dominio, privateKey);
-                string id = certificate.Id;
+            // Certificado
+            Certificate certificate = await zeroSslClient.Certificate.Create(dominio, privateKey);
+            string id = certificate.Id;
 
-                // Grabar fichero
-                Console.WriteLine($"Preparando validación {i}");
-                FileInfo fileInfo = new FileInfo(certificate.Validation.OtherMethods.DomainDotCom.FileValidationUrlHttp);
-                string ficharo = $"{fileInfo}".Replace($"http://{dominio}", string.Empty);
-                ficharo = ficharo.Replace("/", "\\");
-                ficharo = $"C:\\inetpub\\wwwroot{ficharo}";
-                await File.WriteAllTextAsync(ficharo, $"{string.Join("\n", certificate.Validation.OtherMethods.DomainDotCom.FileValidationContent)}");
+            Console.WriteLine($"{dominio} creado, valide y luego presione enter");
+            Console.ReadLine();
 
-                Console.WriteLine($"Haciendo challenge {i}");
-                bool challenge = await zeroSslClient.Certificate.Challenge(certificate, ValidationMethod.HTTP_CSR_HASH);
-            }
+            Download download = await zeroSslClient.Certificate.Download(certificate, privateKey);
+            await File.WriteAllTextAsync("E:\\certificate.crt", download.CertificateCrt);
+            await File.WriteAllTextAsync("E:\\private.key", download.CertificateCrt);
 
             Console.WriteLine("Enter para continuar");
             Console.ReadLine();

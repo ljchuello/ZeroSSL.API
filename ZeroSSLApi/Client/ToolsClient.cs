@@ -33,17 +33,10 @@ namespace ZeroSSLApi.Client
             using (RSA rsa = RSA.Create())
             {
                 rsa.KeySize = longitudClave;
-                string clavePrivada = Convert.ToBase64String(rsa.ExportRSAPrivateKey());
+                string clavePrivada = Convert.ToBase64String(rsa.ExportRSAPrivateKey()).TrimEnd('\r', '\n');
 
-                return clavePrivada.Trim();
+                return clavePrivada;
             }
-        }
-
-        public string KeyToPem(string clavePrivadaBase64)
-        {
-            // Agrega las etiquetas PEM necesarias
-            string pemFormat = $"-----BEGIN PRIVATE KEY-----\n{clavePrivadaBase64}\n-----END PRIVATE KEY-----";
-            return pemFormat.Trim();
         }
 
         public string GenerarCSR(string dominio, string clavePrivadaBase64)

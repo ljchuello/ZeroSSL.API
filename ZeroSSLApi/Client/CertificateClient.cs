@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Runtime.ConstrainedExecution;
 using ZeroSSLApi.Objets;
+using ZeroSSLApi.Objets.Download;
 
 namespace ZeroSSLApi.Client
 {
@@ -97,6 +98,47 @@ namespace ZeroSSLApi.Client
         public async Task<bool> Challenge(Certificate certificate, ValidationMethod validationMethod)
         {
             return await Challenge(certificate.Id, validationMethod);
+        }
+
+        public async Task<Download> Download(string certificateId, string privateKey)
+        {
+            // Send
+            string json = await Core.SendGetRequest($"/certificates/{certificateId}/download/return?access_key={privateKey}");
+
+            // To object
+            Download download = JsonConvert.DeserializeObject<Download>(json) ?? new Download();
+
+            // Set private key
+            download.PrivateKey = $"-----BEGIN PRIVATE KEY-----\n{privateKey}\n-----END PRIVATE KEY-----";
+
+            // Freedom
+            return download;
+        }
+
+        public async Task<Download> Download(Certificate certificate, string privateKey)
+        {
+            // Send
+            string json = await Core.SendGetRequest($"/certificates/{certificate.Id}/download/return?access_key={_token}");
+
+            // To object
+            Download download = JsonConvert.DeserializeObject<Download>(json) ?? new Download();
+
+            const int lineLength = 64;
+
+            // Private key
+            string formattedKey = $"-----BEGIN PRIVATE KEY-----\n";
+            for (int i = 0; i < privateKey.Length; i += lineLength)
+            {
+                int remainingLength = Math.Min(lineLength, privateKey.Length - i);
+                formattedKey += privateKey.Substring(i, remainingLength) + "\n";
+            }
+            formattedKey += $"-----END PRIVATE KEY-----";
+
+            // Set private key
+            download.PrivateKey = formattedKey;
+
+            // Freedom
+            return download;
         }
     }
 }
