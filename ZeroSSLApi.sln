@@ -9,8 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test", "Test\Test.csproj", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Elementos de la solución", "Elementos de la solución", "{1492E273-0974-4C10-B3A6-5C2F0A622A34}"
 	ProjectSection(SolutionItems) = preProject
-		..\..\Users\LJChuello\Pictures\icon_128.png = ..\..\Users\LJChuello\Pictures\icon_128.png
-		..\..\Users\LJChuello\Pictures\README.md = ..\..\Users\LJChuello\Pictures\README.md
+		ZeroSSLApi\icon_128.png = ZeroSSLApi\icon_128.png
+		ZeroSSLApi\README.md = ZeroSSLApi\README.md
 	EndProjectSection
 EndProject
 Global
