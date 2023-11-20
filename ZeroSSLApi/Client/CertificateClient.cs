@@ -72,6 +72,12 @@ namespace ZeroSSLApi.Client
             return certificate;
         }
 
+        /// <summary>
+        /// Solve the challenge to validate the certificate
+        /// </summary>
+        /// <param name="certificateId"></param>
+        /// <param name="validationMethod"></param>
+        /// <returns></returns>
         public async Task<bool> Challenge(string certificateId, ValidationMethod validationMethod)
         {
            // Set
@@ -93,23 +99,22 @@ namespace ZeroSSLApi.Client
             }
         }
 
+        /// <summary>
+        /// Solve the challenge to validate the certificate
+        /// </summary>
+        /// <param name="certificate"></param>
+        /// <param name="validationMethod"></param>
+        /// <returns></returns>
         public async Task<bool> Challenge(Certificate certificate, ValidationMethod validationMethod)
         {
             return await Challenge(certificate.Id, validationMethod);
         }
 
-        public async Task<Download> Download(string certificateId, string privateKey)
-        {
-            // Send
-            string json = await Core.SendGetRequest($"/certificates/{certificateId}/download/return?access_key={privateKey}");
-
-            // To object
-            Download download = JsonConvert.DeserializeObject<Download>(json) ?? new Download();
-
-            // Freedom
-            return download;
-        }
-
+        /// <summary>
+        /// Download the certificate
+        /// </summary>
+        /// <param name="certificateId"></param>
+        /// <returns></returns>
         public async Task<Download> Download(string certificateId)
         {
             // Send
@@ -122,6 +127,11 @@ namespace ZeroSSLApi.Client
             return download;
         }
 
+        /// <summary>
+        /// Download the certificate
+        /// </summary>
+        /// <param name="certificate"></param>
+        /// <returns></returns>
         public async Task<Download> Download(Certificate certificate)
         {
             return await Download(certificate.Id);

@@ -3,14 +3,14 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using ZeroSSLApi.Objets.Error;
 
 namespace ZeroSSLApi
 {
     public class Core
     {
-        public static long PerPage = 50;
-
         private const string ApiServer = "https://api.zerossl.com";
 
         public static async Task<string> SendGetRequest(string url)
@@ -27,30 +27,16 @@ namespace ZeroSSLApi
             // Response
             string json = await httpResponseMessage.Content.ReadAsStringAsync();
 
-            switch (httpResponseMessage.StatusCode)
+            // Get Error
+            JObject result = JObject.Parse(json);
+            Error error = JsonConvert.DeserializeObject<Error>($"{result["error"]}") ?? new Error();
+            if (string.IsNullOrWhiteSpace(error.Type) == false)
             {
-                case HttpStatusCode.OK:
-                    break;
-
-                default:
-                    // Get Error
-                    JObject result = JObject.Parse(json);
-                    //Error error = JsonConvert.DeserializeObject<Error>($"{result["error"]}") ?? new Error();
-
-                    //Check error
-                    //if (error.Message.Contains("with ID") && error.Message.Contains("not found"))
-                    //{
-                    //    // The error is due to the resource not being found. Let's make it return empty instead of an error.
-                    //    json = "{}";
-                    //}
-                    //else
-                    //{
-                    //    // If it's a genuine error
-                    //    throw new Exception($"{error.Code} - {error.Message}");
-                    //}
-                    break;
+                // certificate_not_found
+                throw new Exception($"{error.Code} - {error.Type}");
             }
 
+            // Free
             return json;
         }
 
@@ -70,75 +56,15 @@ namespace ZeroSSLApi
             // Response
             string json = await httpResponseMessage.Content.ReadAsStringAsync();
 
-            switch (httpResponseMessage.StatusCode)
+            // Get Error
+            JObject result = JObject.Parse(json);
+            Error error = JsonConvert.DeserializeObject<Error>($"{result["error"]}") ?? new Error();
+            if (string.IsNullOrWhiteSpace(error.Type) == false)
             {
-                case HttpStatusCode.Created:
-                case HttpStatusCode.OK:
-                    break;
-
-                default:
-                    // Get Error
-                    JObject result = JObject.Parse(json);
-                    //Error error = JsonConvert.DeserializeObject<Error>($"{result["error"]}") ?? new Error();
-
-                    ////Check error
-                    //if (error.Message.Contains("with ID") && error.Message.Contains("not found"))
-                    //{
-                    //    // The error is due to the resource not being found. Let's make it return empty instead of an error.
-                    //    json = "{}";
-                    //}
-                    //else
-                    //{
-                    //    // If it's a genuine error
-                    //    throw new Exception($"{error.Code} - {error.Message}");
-                    //}
-                    break;
+                throw new Exception($"{error.Code} - {error.Type}");
             }
 
-            return json;
-        }
-
-        public static async Task<string> SendPutRequest(string token, string url, string content)
-        {
-            HttpResponseMessage httpResponseMessage;
-            using (HttpClient httpClient = new HttpClient())
-            {
-                using (HttpRequestMessage httpRequestMessage = new HttpRequestMessage(new HttpMethod("PUT"), $"{ApiServer}{url}"))
-                {
-                    httpRequestMessage.Headers.TryAddWithoutValidation("Authorization", $"Bearer {token}");
-                    httpRequestMessage.Content = new StringContent(content);
-                    httpRequestMessage.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
-                    httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
-                }
-            }
-
-            // Response
-            string json = await httpResponseMessage.Content.ReadAsStringAsync();
-
-            switch (httpResponseMessage.StatusCode)
-            {
-                case HttpStatusCode.OK:
-                    break;
-
-                default:
-                    // Get Error
-                    JObject result = JObject.Parse(json);
-                    //Error error = JsonConvert.DeserializeObject<Error>($"{result["error"]}") ?? new Error();
-
-                    ////Check error
-                    //if (error.Message.Contains("with ID") && error.Message.Contains("not found"))
-                    //{
-                    //    // The error is due to the resource not being found. Let's make it return empty instead of an error.
-                    //    json = "{}";
-                    //}
-                    //else
-                    //{
-                    //    // If it's a genuine error
-                    //    throw new Exception($"{error.Code} - {error.Message}");
-                    //}
-                    break;
-            }
-
+            // Free
             return json;
         }
 

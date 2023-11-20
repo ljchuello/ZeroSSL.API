@@ -6,7 +6,7 @@
 
 		<PackageId>ZeroSSL.API</PackageId>
 		<Title>ZeroSSL.API</Title>
-		<Version>0.3.6</Version>
+		<Version>0.3.8</Version>
 		<Authors>ljchuello</Authors>
 		<Description>Library in .NET / C# that allows interacting with ZeroSSL APIs to manage certificates. Ideal for automating the creation and renewal of certificates without dealing with Let's Encrypt limits.</Description>
 		<RepositoryUrl>https://github.com/ljchuello/ZeroSSL.API</RepositoryUrl>
