@@ -83,9 +83,6 @@ namespace ZeroSSLApi.Client
             // To object
             Certificate certificate = JsonConvert.DeserializeObject<Certificate>(json);
 
-            // Get DomainDotCom
-            JObject result = JObject.Parse(json);
-
             if (string.IsNullOrWhiteSpace(certificate.Id) == false)
             {
                 return true;
@@ -113,16 +110,21 @@ namespace ZeroSSLApi.Client
             return download;
         }
 
-        public async Task<Download> Download(Certificate certificate)
+        public async Task<Download> Download(string certificateId)
         {
             // Send
-            string json = await Core.SendGetRequest($"/certificates/{certificate.Id}/download/return?access_key={_token}");
+            string json = await Core.SendGetRequest($"/certificates/{certificateId}/download/return?access_key={_token}");
 
             // To object
             Download download = JsonConvert.DeserializeObject<Download>(json) ?? new Download();
 
             // Freedom
             return download;
+        }
+
+        public async Task<Download> Download(Certificate certificate)
+        {
+            return await Download(certificate.Id);
         }
     }
 }
