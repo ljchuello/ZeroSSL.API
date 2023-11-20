@@ -19,3 +19,19 @@ To install you must go to Nuget package manager and search for "ZeroSSL.API" and
 ### [NuGet Package](https://www.nuget.org/packages/ZeroSSL.API)
 
     PM> Install-Package ZeroSSL.API
+
+## Create certificate
+
+```csharp
+// First step is to instantiate the client and set the API key.
+ZeroSslClient zeroSslClient = new ZeroSslClient("apiKey"));
+
+// Domain to which the certificate will be added
+string domain = "text.deployrise.com";
+
+// We create the AsymmetricCipherKeyPair object that will generate the private and public key
+AsymmetricCipherKeyPair asymmetricCipherKeyPair = zeroSslClient.Tools.GenerateRsaKeyPair();
+
+// Then we proceed to create the certificate. If everything is correct, it will return an object of type Certificate
+Certificate certificate = await zeroSslClient.Certificate.Create(domain, asymmetricCipherKeyPair);
+```
