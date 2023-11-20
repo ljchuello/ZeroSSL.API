@@ -11,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Elementos de la solución",
 	ProjectSection(SolutionItems) = preProject
 		icon_128.png = icon_128.png
 		README.md = README.md
+		ZeroSSLApi\zerossl_icon.png = ZeroSSLApi\zerossl_icon.png
 	EndProjectSection
 EndProject
 Global

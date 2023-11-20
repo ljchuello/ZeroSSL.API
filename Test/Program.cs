@@ -14,17 +14,17 @@ namespace Test
 
         static async Task MainAsync()
         {
-            string dominio = $"202.entecprois.com";
+            string domain = $"202.entecprois.com";
 
             ZeroSslClient zeroSslClient = new ZeroSslClient(await File.ReadAllTextAsync("D:\\zerossltoken.txt"));
 
-            // Llave privada
+            // We create the AsymmetricCipherKeyPair object that will generate the private and public key
             AsymmetricCipherKeyPair asymmetricCipherKeyPair = zeroSslClient.Tools.GenerateRsaKeyPair();
 
-            // Certificado
-            Certificate certificate = await zeroSslClient.Certificate.Create(dominio, asymmetricCipherKeyPair);
+            // Then we proceed to create the certificate. If everything is correct, it will return an object of type Certificate
+            Certificate certificate = await zeroSslClient.Certificate.Create(domain, asymmetricCipherKeyPair);
 
-            Console.WriteLine($"{dominio} creado, valide y luego presione enter");
+            Console.WriteLine($"{domain} creado, valide y luego presione enter");
             Console.ReadLine();
 
             Download download = await zeroSslClient.Certificate.Download(certificate);
