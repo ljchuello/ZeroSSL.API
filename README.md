@@ -49,7 +49,7 @@ To validate the domain correctly with the HTTP_CSR_HASH method, follow these ste
 1. Create the file and its content.
 1. Resolve the challenge.
 
-### 1. Prepare the path where the .txt file will be stored.
+### 1. Prepare the path where the .txt file will be stored
 
 It's the web path of the file or the web address to which ZeroSSL servers will make a web request to verify that the file exists and contains the verification information.
 
@@ -62,7 +62,7 @@ In this case, `certificate.Validation.OtherMethods.DomainDotCom.FileValidationUr
 
 This is an example of the format for the URL `http://test.github.com/.well-known/pki-validation/613A9BBA456E7D714F39370CBAA5EC2A.txt`
 
-### 2. Create the file and its content.
+### 2. Create the file and its content
 
 Here I'll provide an example of how I create the file with its content. The logic should be similar for your case, regardless of the infrastructure you're using.
 
@@ -91,6 +91,20 @@ In this way, I create the .txt file. It's important to emphasize that the conten
 **Remember, you should apply your logic adapted to your infrastructure**
 
 With this, we have completed this part.
+
+### 3. Resolve the challenge
+
+```csharp
+// To resolve the challenge, pass the certificate as a parameter and specify the type of challenge.
+bool verified = await zeroSslClient.Certificate.Challenge(certificate, ValidationMethod.HTTP_CSR_HASH);
+
+// We can also pass the certificate ID instead of the complete certificate
+bool verified = await zeroSslClient.Certificate.Challenge("certificateID", ValidationMethod.HTTP_CSR_HASH);
+```
+
+Once it returns True, wait for a couple of minutes, and you'll be able to download the certificate.
+
+With this, we conclude the last step.
 
 ---
 ## Verify Domain | DNS Challenge
