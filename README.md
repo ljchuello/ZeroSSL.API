@@ -38,9 +38,9 @@ Certificate certificate = await zeroSslClient.Certificate.Create(domain, asymmet
 ---
 ## Verify Domains | DNS Challenge
 
-Once the certificate is created, it needs to be validated. Let's see an example of how to validate it using DNS.
+**NOTE**: When validating through DNS `CNAME_CSR_HASH`, the certificate stays in `pending_validation` status for a few minutes up to 12 hours. I strongly recommend using the `HTTP_CSR_HASH` validation method
 
-NOTE: When validating through DNS "CNAME_CSR_HASH," the certificate stays in "pending_validation" status for a few minutes up to 12 hours. I strongly recommend using the "HTTP_CSR_HASH" validation method
+Once the certificate is created, it needs to be validated. Let's see an example of how to validate it using DNS.
 
 | Record Type | Name | Value |
 | :----------: | :----------: | :----------: |
