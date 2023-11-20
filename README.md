@@ -35,3 +35,29 @@ AsymmetricCipherKeyPair asymmetricCipherKeyPair = zeroSslClient.Tools.GenerateRs
 // Then we proceed to create the certificate. If everything is correct, it will return an object of type Certificate
 Certificate certificate = await zeroSslClient.Certificate.Create(domain, asymmetricCipherKeyPair);
 ```
+
+## Verify Domains | DNS Challenge
+
+Once the certificate is created, it needs to be validated. Let's see an example of how to validate it using DNS.
+
+| Record Type | Name | Value |
+| :----------: | :----------: | :----------: |
+| CNAME | certificate.Validation.OtherMethods.DomainDotCom.CnameValidationP1 | certificate.Validation.OtherMethods.DomainDotCom.CnameValidationP2 |
+
+Here's a real example of how to verify the certificate for test.github.com using DNS validation
+
+| Record Type | Name | Value |
+| :----------: | :----------: | :----------: |
+| CNAME | _1EA82E8C7EB83DB1A5861A02DDC8DE80.test.github.com | 3921D03C724EAA6EF42FCE5C8040A39E.464AC15B66374686070B777C674E46F7.51b54eb096d69ad.comodoca.com |
+
+Once the DNS record is created in the domain, we proceed to resolve the challenge.
+
+```csharp
+// To resolve the challenge, pass the certificate as a parameter and specify the type of challenge.
+bool verified = await zeroSslClient.Certificate.Challenge(certificate, ValidationMethod.CNAME_CSR_HASH);
+
+// We can also pass the certificate ID instead of the complete certificate
+bool verified = await zeroSslClient.Certificate.Challenge("certificateID", ValidationMethod.CNAME_CSR_HASH);
+```
+
+If "verified" returns True, it means the certificate is validated. If it returns False, an error has occurred, and you should check or correct any possible issues.
