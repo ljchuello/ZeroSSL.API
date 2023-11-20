@@ -26,14 +26,14 @@ To install you must go to Nuget package manager and search for "ZeroSSL.API" and
 // First step is to instantiate the client and set the API key.
 ZeroSslClient zeroSslClient = new ZeroSslClient("apiKey"));
 
-// Domain to which the certificate will be added
-string domain = "text.deployrise.com";
-
 // We create the AsymmetricCipherKeyPair object that will generate the private and public key
 AsymmetricCipherKeyPair asymmetricCipherKeyPair = zeroSslClient.Tools.GenerateRsaKeyPair();
 
 // Then we proceed to create the certificate. If everything is correct, it will return an object of type Certificate
 Certificate certificate = await zeroSslClient.Certificate.Create(domain, asymmetricCipherKeyPair);
+
+// Once the certificate is created, it's essential to store the private key used in its generation. This will be necessary later for publishing the certificate.
+string privateKey = zeroSslClient.Tools.GetPrivateKeyAsString(asymmetricCipherKeyPair.Private);
 ```
 ---
 
@@ -133,6 +133,35 @@ bool verified = await zeroSslClient.Certificate.Challenge(certificate, Validatio
 bool verified = await zeroSslClient.Certificate.Challenge("certificateID", ValidationMethod.CNAME_CSR_HASH);
 ```
 
-If "verified" returns True, it means the certificate is validated. If it returns False, an error has occurred, and you should check or correct any possible issues.
+If `verified` returns True, it means the certificate is validated. If it returns False, an error has occurred, and you should check or correct any possible issues.
 
 Once it returns True, wait a few minutes, and you can download the certificate
+
+---
+## Download Certificate
+
+Once the certificate is in the `issued` state, you can download the certificate to implement it on `Nginx`, `IIS`, `Apache`, or the web server of your preference
+
+To achieve this, you will need the certificate object you created and the private key string that was set earlier in the `Create Certificate` process
+
+```csharp
+// We download the files at this line
+Download download = await zeroSslClient.Certificate.Download(certificate);
+
+// You can also download by passing the certificate ID as a parameter
+Download download = await zeroSslClient.Certificate.Download("df29fabbce961f1c997a4b9dcd8da0df");
+```
+
+Once the `zeroSslClient.Certificate.Download` function is executed, you will have the `certificate.crt` and `ca_bundle.crt` in the Download object. Additionally, in the first part, you set the `privateKey`. With this, you have all the information for the complete certificate, ready for implementation
+
+As an extra, if you want to create the files to later copy and paste them into the web server, you can do it this way. In my case, for simplicity, I will place them on the D:\ drive
+
+```csharp
+// We write the private key file, whose variable we had set in the first step
+File.WriteAllText("D:\\privateKey.key", privateKey);
+
+// We write the certificate.crt file
+File.WriteAllText("D:\\certificate.crt", certificateCrt);
+```
+
+In this way, we complete 100% of the process of creating a certificate for use in production
