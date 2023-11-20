@@ -19,7 +19,7 @@ To install you must go to Nuget package manager and search for "ZeroSSL.API" and
 ### [NuGet Package](https://www.nuget.org/packages/ZeroSSL.API)
 
     PM> Install-Package ZeroSSL.API
-
+---
 ## Create certificate
 
 ```csharp
@@ -35,10 +35,12 @@ AsymmetricCipherKeyPair asymmetricCipherKeyPair = zeroSslClient.Tools.GenerateRs
 // Then we proceed to create the certificate. If everything is correct, it will return an object of type Certificate
 Certificate certificate = await zeroSslClient.Certificate.Create(domain, asymmetricCipherKeyPair);
 ```
-
+---
 ## Verify Domains | DNS Challenge
 
 Once the certificate is created, it needs to be validated. Let's see an example of how to validate it using DNS.
+
+NOTE: When validating through DNS "CNAME_CSR_HASH," the certificate stays in "pending_validation" status for a few minutes up to 12 hours. I strongly recommend using the "HTTP_CSR_HASH" validation method
 
 | Record Type | Name | Value |
 | :----------: | :----------: | :----------: |
@@ -61,3 +63,5 @@ bool verified = await zeroSslClient.Certificate.Challenge("certificateID", Valid
 ```
 
 If "verified" returns True, it means the certificate is validated. If it returns False, an error has occurred, and you should check or correct any possible issues.
+
+Once it returns True, wait a few minutes, and you can download the certificate
