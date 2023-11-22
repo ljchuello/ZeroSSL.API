@@ -4,6 +4,10 @@
 
 Library in .NET / C# that allows interacting with ZeroSSL APIs to manage certificates. Ideal for automating the creation and renewal of certificates without dealing with Let's Encrypt limits
 
+**Note:** To use this library, you need to have the paid version of ZeroSSL.com. ZeroSSL doesn't provide API access in its free version
+
+If you have any errors or questions, please create an [issue](https://github.com/ljchuello/ZeroSSL.API/issues), and I will respond as soon as possible
+
 ## Compatibility
 
 This library is developed in .NET Standard 2.1 and is compatible with all .NET and .NET Core implementations (.NET Framework is not supported) , it can also be used in Console projects, Web API, Class Library and even with Blazor WASM.
