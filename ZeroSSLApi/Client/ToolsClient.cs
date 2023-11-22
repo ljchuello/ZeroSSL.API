@@ -60,7 +60,7 @@ namespace ZeroSSLApi.Client
         /// <returns></returns>
         public AsymmetricCipherKeyPair GenerateRsaKeyPair()
         {
-            var keyGenerationParameters = new KeyGenerationParameters(new SecureRandom(), 2048);
+            var keyGenerationParameters = new KeyGenerationParameters(new SecureRandom(), 4096);
             var generator = GeneratorUtilities.GetKeyPairGenerator("RSA");
             generator.Init(keyGenerationParameters);
 

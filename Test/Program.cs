@@ -1,5 +1,6 @@
 ﻿using Org.BouncyCastle.Crypto;
 using System;
+using System.Net;
 using ZeroSSLApi;
 using ZeroSSLApi.Objets;
 using ZeroSSLApi.Objets.Certificate;
@@ -16,10 +17,17 @@ namespace Test
 
         static async Task MainAsync()
         {
-            ZeroSslClient zeroSslClient = new ZeroSslClient(await File.ReadAllTextAsync("D:\\zerossltoken.txt"));
+            //ZeroSslClient zeroSslClient = new ZeroSslClient(await File.ReadAllTextAsync("D:\\zerossltoken.txt"));
+
+            //string json = "";
+
+            //using (WebClient webClient = new WebClient())
+            //{
+            //     json = webClient.DownloadString("https://api.zerossl.com/certificates/9fba0824cc1c7f5ac008a23cc8e5caab/revoke?access_key=5c18794a77fab4c68602a5a9263cdc75");
+            //}
 
             //// Domain to which the certificate will be added
-            //string domain = $"ljchuellox2.entecprois.com";
+            //string domain = $"{Guid.NewGuid()}.entecprois.com";
 
             //// We create the AsymmetricCipherKeyPair object that will generate the private and public key
             //AsymmetricCipherKeyPair asymmetricCipherKeyPair = zeroSslClient.Tools.GenerateRsaKeyPair();
@@ -54,7 +62,7 @@ namespace Test
             //// To achieve this, you will need the certificate object you created and the private key string that was set earlier in the "Create Certificate" process
 
             //// We download the files at this line
-            Download download = await zeroSslClient.Certificate.Download("bf3ab834855783285d2615fbd03b73a5");
+            //Download download = await zeroSslClient.Certificate.Download(certificate);
 
             //// Setting the certificate.crt
             //string certificateCrt = download.CertificateCrt;
