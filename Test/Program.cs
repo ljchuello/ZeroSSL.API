@@ -17,61 +17,54 @@ namespace Test
 
         static async Task MainAsync()
         {
-            //ZeroSslClient zeroSslClient = new ZeroSslClient(await File.ReadAllTextAsync("D:\\zerossltoken.txt"));
+            ZeroSslClient zeroSslClient = new ZeroSslClient(await File.ReadAllTextAsync("D:\\zerossltoken.txt"));
 
-            //string json = "";
+            // Domain to which the certificate will be added
+            string domain = $"ljchuello.duckdns.org";
 
-            //using (WebClient webClient = new WebClient())
-            //{
-            //     json = webClient.DownloadString("https://api.zerossl.com/certificates/9fba0824cc1c7f5ac008a23cc8e5caab/revoke?access_key=5c18794a77fab4c68602a5a9263cdc75");
-            //}
+            // We create the AsymmetricCipherKeyPair object that will generate the private and public key
+            AsymmetricCipherKeyPair asymmetricCipherKeyPair = zeroSslClient.Tools.GenerateRsaKeyPair();
 
-            //// Domain to which the certificate will be added
-            //string domain = $"{Guid.NewGuid()}.entecprois.com";
+            // Then we proceed to create the certificate. If everything is correct, it will return an object of type Certificate
+            Certificate certificate = await zeroSslClient.Certificate.Create(domain, asymmetricCipherKeyPair);
 
-            //// We create the AsymmetricCipherKeyPair object that will generate the private and public key
-            //AsymmetricCipherKeyPair asymmetricCipherKeyPair = zeroSslClient.Tools.GenerateRsaKeyPair();
+            // Once the certificate is created, it's essential to store the private key used in its generation. This will be necessary later for publishing the certificate.
+            string privateKey = zeroSslClient.Tools.GetPrivateKeyAsString(asymmetricCipherKeyPair.Private);
 
-            //// Then we proceed to create the certificate. If everything is correct, it will return an object of type Certificate
-            //Certificate certificate = await zeroSslClient.Certificate.Create(domain, asymmetricCipherKeyPair);
+            // This is a real example of how the URL we need to prepare looks
+            // http://test.github.com/.well-known/pki-validation/EA8C215B907D0AB32AC5D08558AA0048.txt
 
-            //// Once the certificate is created, it's essential to store the private key used in its generation. This will be necessary later for publishing the certificate.
-            //string privateKey = zeroSslClient.Tools.GetPrivateKeyAsString(asymmetricCipherKeyPair.Private);
+            // We can obtain the web address using the Certificate object
+            string route = certificate.Validation.OtherMethods.DomainDotCom.FileValidationUrlHttp;
 
-            //// This is a real example of how the URL we need to prepare looks
-            //// http://test.github.com/.well-known/pki-validation/EA8C215B907D0AB32AC5D08558AA0048.txt
+            // In this case, I'll use Uri to get the last part, which is the filename
+            string fileName = Path.GetFileName(new Uri(certificate.Validation.OtherMethods.DomainDotCom.FileValidationUrlHttp).AbsolutePath);
 
-            //// We can obtain the web address using the Certificate object
-            //string route = certificate.Validation.OtherMethods.DomainDotCom.FileValidationUrlHttp;
+            // This is the directory I have created and prepared for validation. Note that it logically aligns with step 1
+            string dir = $"C:\\inetpub\\wwwroot\\.well-known\\pki-validation\\{fileName}";
 
-            //// In this case, I'll use Uri to get the last part, which is the filename
-            //string fileName = Path.GetFileName(new Uri(certificate.Validation.OtherMethods.DomainDotCom.FileValidationUrlHttp).AbsolutePath);
+            // On this line, I convert the array of file content to a string, and I add line breaks
+            string fileContent = string.Join("\n", certificate.Validation.OtherMethods.DomainDotCom.FileValidationContent);
 
-            //// This is the directory I have created and prepared for validation. Note that it logically aligns with step 1
-            //string dir = $"C:\\inetpub\\wwwroot\\.well-known\\pki-validation\\{fileName}";
+            // Proceeding to create the file
+            File.WriteAllText(dir, fileContent);
 
-            //// On this line, I convert the array of file content to a string, and I add line breaks
-            //string fileContent = string.Join("\n", certificate.Validation.OtherMethods.DomainDotCom.FileValidationContent);
+            // To resolve the challenge, pass the certificate as a parameter and specify the type of challenge.
+            bool verified = await zeroSslClient.Certificate.Challenge(certificate, ValidationMethod.HTTP_CSR_HASH);
 
-            //// Proceeding to create the file
-            //File.WriteAllText(dir, fileContent);
+            // To achieve this, you will need the certificate object you created and the private key string that was set earlier in the "Create Certificate" process
 
-            //// To resolve the challenge, pass the certificate as a parameter and specify the type of challenge.
-            //bool verified = await zeroSslClient.Certificate.Challenge(certificate, ValidationMethod.HTTP_CSR_HASH);
+            // We download the files at this line
+            Download download = await zeroSslClient.Certificate.Download(certificate);
 
-            //// To achieve this, you will need the certificate object you created and the private key string that was set earlier in the "Create Certificate" process
+            // Setting the certificate.crt
+            string certificateCrt = download.CertificateCrt;
 
-            //// We download the files at this line
-            //Download download = await zeroSslClient.Certificate.Download(certificate);
+            // We write the private key file, whose variable we had set in the first step
+            File.WriteAllText("D:\\privateKey.key", privateKey);
 
-            //// Setting the certificate.crt
-            //string certificateCrt = download.CertificateCrt;
-
-            //// We write the private key file, whose variable we had set in the first step
-            //File.WriteAllText("D:\\privateKey.key", privateKey);
-
-            //// We write the certificate.crt file
-            //File.WriteAllText("D:\\certificate.crt", certificateCrt);
+            // We write the certificate.crt file
+            File.WriteAllText("D:\\certificate.crt", certificateCrt);
         }
     }
 }
